@@ -22,12 +22,23 @@ const server = http.createServer((req, res) => {
 
   const handler = routes[pathName];
   if (handler) {
-    handler(req, res);
+    try {
+      handler(req, res);
+    } catch (err) {
+      console.error('Error occurred in handler:', err);
+      res.statusCode = 500;
+      res.setHeader('Content-Type', 'text/plain');
+      res.end('Internal Server Error');
+    }
   } else {
     res.statusCode = 404;
     res.setHeader('Content-Type', 'text/plain');
     res.end('Not Found');
   }
+});
+
+server.on('error', (error) => {
+  console.error('Server error:', error);
 });
 
 server.listen(port, hostname, () => {
